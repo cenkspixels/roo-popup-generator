@@ -1,0 +1,12 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Screenshots from browser testing
+screenshot*.png
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
