@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roo Popup Generator</title>
+
+  <!-- Prism.js for syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="css/popup.css">
+  <link rel="stylesheet" href="css/editor.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="app-logo">
+      <span class="logo-icon">🎰</span>
+      <h1>Roo Popup Generator</h1>
+    </div>
+    <div class="app-actions">
+      <button id="copyAllBtn" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copy All
+      </button>
+    </div>
+  </header>
+
+  <main class="editor-layout">
+
+    <!-- LEFT PANEL -->
+    <div class="panel panel-left">
+
+      <!-- Template Selector -->
+      <section class="panel-section template-selector">
+        <label for="templateSelect">Template</label>
+        <select id="templateSelect"></select>
+      </section>
+
+      <!-- Live Preview -->
+      <section class="panel-section preview-section">
+        <h2 class="section-title">Live Preview</h2>
+        <div class="preview-container">
+          <div id="previewArea" class="preview-area"></div>
+        </div>
+      </section>
+
+      <!-- JSON Config Editor -->
+      <section class="panel-section config-section">
+        <h2 class="section-title">JSON Config</h2>
+        <textarea id="configEditor" spellcheck="false"></textarea>
+        <div id="configError" class="config-error" hidden></div>
+      </section>
+
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="panel panel-right">
+
+      <!-- HTML Output -->
+      <section class="panel-section code-section">
+        <div class="section-header">
+          <h2 class="section-title">Generated HTML</h2>
+          <button class="btn btn-sm btn-copy" data-target="htmlOutput">Copy</button>
+        </div>
+        <pre class="code-output"><code id="htmlOutput" class="language-html"></code></pre>
+      </section>
+
+      <!-- CSS Output -->
+      <section class="panel-section code-section">
+        <div class="section-header">
+          <h2 class="section-title">Generated CSS</h2>
+          <button class="btn btn-sm btn-copy" data-target="cssOutput">Copy</button>
+        </div>
+        <pre class="code-output"><code id="cssOutput" class="language-css"></code></pre>
+      </section>
+
+    </div>
+
+  </main>
+
+  <!-- Prism.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-css.min.js"></script>
+
+  <!-- App scripts -->
+  <script src="js/templates.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
