@@ -362,6 +362,15 @@
   letter-spacing: -0.14px;
   line-height: var(--spacing-5);
   box-shadow: var(--shadow-cta-inset);
+  position: relative;
+  overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.popup-free-coins .popup-cta.is-claimed {
+  pointer-events: none;
+  opacity: 0.85;
 }
 
 /* ==========================================================================

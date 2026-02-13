@@ -87,7 +87,8 @@ ${amountsHtml}
       currencies: [
         { icon: 'assets/images/sc-coin.png', value: '1', label: 'FOR FREE' }
       ],
-      cta: { text: 'Claim Now' }
+      cta: { text: 'Claim Now' },
+      claimCoinImage: 'assets/images/sc-coin.png'
     },
 
     render(config) {
@@ -103,6 +104,8 @@ ${amountsHtml}
         ? `<img class="popup-title-image" src="${config.titleImage}" alt="CLAIM YOUR FREE COINS!">`
         : '';
 
+      const coinImg = config.claimCoinImage || 'assets/images/sc-coin.png';
+
       return `<div class="popup-overlay active">
           <div class="popup-container popup-free-coins">
             <button class="popup-close" aria-label="Close">
@@ -117,7 +120,14 @@ ${amountsHtml}
               <div class="popup-currencies">
 ${currencyRows}
               </div>
-              <button class="popup-cta">${config.cta.text}</button>
+              <button class="popup-cta" id="cta-v1">
+                <img class="popup-claim-coin" src="${coinImg}" alt="" style="--coin-x: calc(-50% + -40px); animation-delay: 0s;">
+                <img class="popup-claim-coin" src="${coinImg}" alt="" style="--coin-x: calc(-50% + -15px); animation-delay: 0.07s;">
+                <img class="popup-claim-coin" src="${coinImg}" alt="" style="--coin-x: calc(-50% + 10px); animation-delay: 0.14s;">
+                <img class="popup-claim-coin" src="${coinImg}" alt="" style="--coin-x: calc(-50% + 35px); animation-delay: 0.21s;">
+                <img class="popup-claim-coin" src="${coinImg}" alt="" style="--coin-x: calc(-50% + -25px); animation-delay: 0.28s;">
+                <span>${config.cta.text}</span>
+              </button>
             </div>
           </div>
         </div>`;

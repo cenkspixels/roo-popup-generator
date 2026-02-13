@@ -73,6 +73,18 @@
   }
 
   function bindPreviewInteractions() {
+    // Coin fountain on Free Coins V1 CTA
+    const ctaV1 = previewArea.querySelector('#cta-v1');
+    if (ctaV1) {
+      ctaV1.addEventListener('click', function () {
+        if (this.classList.contains('is-claimed')) return;
+        this.classList.add('is-claimed');
+        setTimeout(() => {
+          this.classList.remove('is-claimed');
+        }, 1200);
+      });
+    }
+
     // Coin fountain on Free Coins V2 CTA
     const ctaV2 = previewArea.querySelector('#cta-v2');
     if (ctaV2) {
