@@ -14,7 +14,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
 
   <!-- App styles -->
-  <link rel="stylesheet" href="css/popup.css">
+  <link rel="stylesheet" href="css/popup.css" id="popupCSSLink">
+  <style id="livePopupCSS"></style>
   <link rel="stylesheet" href="css/editor.css">
 </head>
 <body>
@@ -72,13 +73,14 @@
         <pre class="code-output"><code id="htmlOutput" class="language-html"></code></pre>
       </section>
 
-      <!-- CSS Output -->
+      <!-- CSS Editor -->
       <section class="panel-section code-section">
         <div class="section-header">
-          <h2 class="section-title">Generated CSS</h2>
-          <button class="btn btn-sm btn-copy" data-target="cssOutput">Copy</button>
+          <h2 class="section-title">CSS Editor</h2>
+          <button class="btn btn-sm btn-copy" id="copyCssBtn">Copy</button>
         </div>
-        <pre class="code-output"><code id="cssOutput" class="language-css"></code></pre>
+        <textarea id="cssEditor" spellcheck="false"></textarea>
+        <div id="cssError" class="config-error" hidden></div>
       </section>
 
     </div>

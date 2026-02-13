@@ -13,13 +13,17 @@
   const configEditor = document.getElementById('configEditor');
   const configError = document.getElementById('configError');
   const htmlOutput = document.getElementById('htmlOutput');
-  const cssOutput = document.getElementById('cssOutput');
+  const cssEditor = document.getElementById('cssEditor');
+  const cssError = document.getElementById('cssError');
+  const livePopupCSS = document.getElementById('livePopupCSS');
   const copyAllBtn = document.getElementById('copyAllBtn');
+  const copyCssBtn = document.getElementById('copyCssBtn');
 
   // --- State ---
   let currentTemplateIndex = 0;
   let currentConfig = null;
   let debounceTimer = null;
+  let cssDebounceTimer = null;
   let cachedPopupCSS = '';
 
   // ----------------------------------------------------------
@@ -28,11 +32,17 @@
   function init() {
     populateTemplateSelector();
     bindEvents();
-    // Load popup.css for the code output panel
+    // Load popup.css into the CSS editor
     fetch('css/popup.css')
       .then(r => r.text())
-      .then(css => { cachedPopupCSS = css; })
-      .catch(() => { cachedPopupCSS = '/* Could not load popup.css */'; })
+      .then(css => {
+        cachedPopupCSS = css;
+        cssEditor.value = css;
+      })
+      .catch(() => {
+        cachedPopupCSS = '/* Could not load popup.css */';
+        cssEditor.value = cachedPopupCSS;
+      })
       .finally(() => { loadTemplate(0); });
   }
 
@@ -120,18 +130,37 @@
       html = '<!-- Render error: ' + e.message + ' -->';
     }
 
-    // CSS — full popup.css contents
-    const css = cachedPopupCSS || '/* Loading CSS... */';
-
     // Set text content (Prism will highlight)
     htmlOutput.textContent = html;
-    cssOutput.textContent = css;
 
     // Re-highlight
     if (window.Prism) {
       Prism.highlightElement(htmlOutput);
-      Prism.highlightElement(cssOutput);
     }
+  }
+
+  // ----------------------------------------------------------
+  // CSS Editor — live editing
+  // ----------------------------------------------------------
+  function onCSSInput() {
+    clearTimeout(cssDebounceTimer);
+    cssDebounceTimer = setTimeout(() => {
+      const css = cssEditor.value;
+      // Inject edited CSS into the live <style> tag (overrides the linked popup.css)
+      livePopupCSS.textContent = css;
+      cachedPopupCSS = css;
+      hideCSSError();
+    }, 200);
+  }
+
+  function showCSSError(msg) {
+    cssError.textContent = msg;
+    cssError.hidden = false;
+  }
+
+  function hideCSSError() {
+    cssError.textContent = '';
+    cssError.hidden = true;
   }
 
   // ----------------------------------------------------------
@@ -188,7 +217,7 @@
     } catch (_) {
       html = '';
     }
-    const css = cachedPopupCSS;
+    const css = cssEditor.value;
     const fontLink = "https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800;900&display=swap";
     const combined = `<!-- Add Google Font: ${fontLink} -->\n\n<!-- HTML -->\n${html}\n\n<style>\n${css}\n</style>`;
     copyToClipboard(combined, copyAllBtn);
@@ -241,7 +270,26 @@
       }
     });
 
+    // CSS editor
+    cssEditor.addEventListener('input', onCSSInput);
+
+    cssEditor.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const start = cssEditor.selectionStart;
+        const end = cssEditor.selectionEnd;
+        cssEditor.value = cssEditor.value.substring(0, start) + '  ' + cssEditor.value.substring(end);
+        cssEditor.selectionStart = cssEditor.selectionEnd = start + 2;
+        onCSSInput();
+      }
+    });
+
     copyAllBtn.addEventListener('click', copyAll);
+
+    // Copy CSS button
+    copyCssBtn.addEventListener('click', () => {
+      copyToClipboard(cssEditor.value, copyCssBtn);
+    });
 
     document.querySelectorAll('.btn-copy').forEach(btn => {
       btn.addEventListener('click', () => {
