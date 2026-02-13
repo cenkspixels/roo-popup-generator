@@ -1,7 +1,12 @@
 /* ============================================================
    TEMPLATE REGISTRY
-   Each template: { name, defaultConfig, render(config), css }
+   Each template: { name, defaultConfig, render(config) }
    ============================================================ */
+
+const CLOSE_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round">
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+              </svg>`;
 
 // eslint-disable-next-line no-unused-vars
 const TEMPLATES = [
@@ -13,108 +18,61 @@ const TEMPLATES = [
     name: 'Special Offer',
     defaultConfig: {
       title: 'Special Offer! 🎁',
-      subtitle: 'SHOW UP DAILY — AND CLAIM YOUR REWARDS',
-      heroImage: 'assets/images/roo-character.svg',
-      bgImage: 'assets/images/offer-bg-wave.svg',
-      scatterImages: [
-        { src: 'assets/images/star-gold.svg', top: '8%', left: '10%', size: '24px', rotate: '-15deg' },
-        { src: 'assets/images/star-gold.svg', top: '12%', right: '12%', size: '18px', rotate: '20deg' },
-        { src: 'assets/images/sparkle.svg', bottom: '30%', left: '6%', size: '20px', rotate: '0deg' }
-      ],
+      subtitle: 'SHOW UP DAILY - AND CLAIM YOUR REWARDS',
+      heroImage: 'assets/images/roo-character.png',
+      bgSvg: 'assets/images/offer-bg-wave.svg',
+      scatterImages: {
+        tl: 'assets/images/sc-coins-scatter1.png',
+        mr: 'assets/images/sc-coins-scatter2.png',
+        br: 'assets/images/roo-coins-scatter.png'
+      },
       amounts: [
-        { icon: 'assets/images/gc-coin.svg', value: '1,000,000', color: '#ffe14d' },
-        { icon: 'assets/images/sc-coin.svg', value: '40', color: '#0fffb2', label: 'FOR\nFREE' }
+        { icon: 'assets/images/gc-coin.png', value: '1,000,000', type: 'gc' },
+        { icon: 'assets/images/sc-coin.png', value: '40', type: 'sc', label: 'FOR\nFREE' }
       ],
-      cta: { text: 'Buy for $24.99' },
-      timer: { label: 'Offer expires in', value: '04:59:32' }
+      cta: { text: 'Buy for $24.99' }
     },
 
     render(config) {
-      const scatterHtml = (config.scatterImages || []).map(s => {
-        const style = [
-          s.top ? `top:${s.top}` : '',
-          s.bottom ? `bottom:${s.bottom}` : '',
-          s.left ? `left:${s.left}` : '',
-          s.right ? `right:${s.right}` : '',
-          s.size ? `width:${s.size};height:${s.size}` : '',
-          s.rotate ? `transform:rotate(${s.rotate})` : ''
-        ].filter(Boolean).join(';');
-        return `    <img class="popup-scatter" src="${s.src}" alt="" style="${style}">`;
+      const amountsHtml = config.amounts.map((a, i) => {
+        const colorClass = a.type === 'gc' ? 'popup-amount-value--gc' : 'popup-amount-value--sc';
+        const labelHtml = a.label ? `\n                  <span class="popup-amount-label">${a.label}</span>` : '';
+        const block = `                <div class="popup-amount">
+                  <img class="popup-amount-icon" src="${a.icon}" alt="">
+                  <span class="popup-amount-value ${colorClass}">${a.value}</span>${labelHtml}
+                </div>`;
+        return i < config.amounts.length - 1
+          ? block + '\n                <span class="popup-amount-separator">+</span>'
+          : block;
       }).join('\n');
 
-      const amountsHtml = config.amounts.map(a => {
-        const labelHtml = a.label
-          ? `\n        <span class="popup-amount-label" style="color:${a.color}">${a.label}</span>`
-          : '';
-        return `      <div class="popup-amount">
-        <img class="popup-amount-icon" src="${a.icon}" alt="">
-        <span class="popup-amount-value" style="color:${a.color}">${a.value}</span>${labelHtml}
-      </div>`;
-      }).join('\n');
+      const scatter = config.scatterImages || {};
 
-      const dividerHtml = config.amounts.length > 1
-        ? '\n      <div class="popup-divider"><span>+</span></div>\n'
-        : '';
-
-      // Insert divider between amounts
-      const amountsWithDivider = config.amounts.length > 1
-        ? config.amounts.map((a, i) => {
-            const labelHtml = a.label
-              ? `\n        <span class="popup-amount-label" style="color:${a.color}">${a.label}</span>`
-              : '';
-            const block = `      <div class="popup-amount">
-        <img class="popup-amount-icon" src="${a.icon}" alt="">
-        <span class="popup-amount-value" style="color:${a.color}">${a.value}</span>${labelHtml}
-      </div>`;
-            return i < config.amounts.length - 1
-              ? block + '\n      <div class="popup-divider"><span>+</span></div>'
-              : block;
-          }).join('\n')
-        : amountsHtml;
-
-      const timerHtml = config.timer
-        ? `\n    <div class="popup-timer">${config.timer.label} <span class="popup-timer-value">${config.timer.value}</span></div>`
-        : '';
-
-      const bgImageHtml = config.bgImage
-        ? `\n    <div class="popup-bg-image" style="background-image:url('${config.bgImage}')"></div>`
-        : '';
-
-      return `<div class="popup-overlay">
-  <div class="popup-container popup--special-offer">
-    <div class="popup-bg"></div>${bgImageHtml}
-    <button class="popup-close">&times;</button>
-${scatterHtml ? scatterHtml + '\n' : ''}    <div class="popup-content">
-      <div class="popup-badge popup-badge--gold">Limited Time</div>
-      <h2 class="popup-title">${config.title}</h2>
-      <p class="popup-subtitle">${config.subtitle}</p>
-      <div class="popup-hero">
-        <img src="${config.heroImage}" alt="Hero">
-      </div>
-      <div class="popup-amounts">
-${amountsWithDivider}
-      </div>
-      <button class="popup-cta">${config.cta.text}</button>${timerHtml}
-    </div>
-  </div>
-</div>`;
-    },
-
-    css: `.popup--special-offer .popup-bg {
-  background: linear-gradient(180deg, #3b1578 0%, #1a0a2e 60%, #0d051a 100%);
-}
-
-.popup--special-offer .popup-title {
-  font-size: 28px;
-  background: linear-gradient(180deg, #fff 0%, #e0d0ff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.popup--special-offer .popup-cta {
-  background: linear-gradient(180deg, #ffe14d 0%, #ffc800 100%);
-}`
+      return `<div class="popup-overlay active">
+          <div class="popup-container popup-special-offer">
+            <div class="popup-bg-svg">
+              <img src="${config.bgSvg}" alt="">
+            </div>
+            <button class="popup-close" aria-label="Close">
+              ${CLOSE_SVG}
+            </button>
+            <h2 class="popup-title">${config.title}</h2>
+            <div class="popup-hero popup-hero--animated">
+              <img class="popup-scatter scatter-tl" src="${scatter.tl}" alt="">
+              <img class="popup-scatter scatter-mr" src="${scatter.mr}" alt="">
+              <img class="popup-scatter scatter-br" src="${scatter.br}" alt="">
+              <img class="popup-hero-main" src="${config.heroImage}" alt="">
+            </div>
+            <div class="popup-content">
+              <p class="popup-subtitle">${config.subtitle}</p>
+              <div class="popup-amounts">
+${amountsHtml}
+              </div>
+              <button class="popup-cta">${config.cta.text}</button>
+            </div>
+          </div>
+        </div>`;
+    }
   },
 
   /* -------------------------------------------------------
@@ -123,143 +81,100 @@ ${amountsWithDivider}
   {
     name: 'Free Coins V1',
     defaultConfig: {
-      title: 'FREE COINS!',
-      subtitle: 'Collect your daily bonus',
-      heroImage: 'assets/images/coin-pile.svg',
-      amounts: [
-        { icon: 'assets/images/gc-coin.svg', value: '500,000', color: '#ffe14d' }
+      heroImage: 'assets/images/pot-of-gold.png',
+      titleImage: 'assets/images/claim-title.png',
+      subtitle: 'You have coins waiting for you!',
+      currencies: [
+        { icon: 'assets/images/sc-coin.png', value: '1', label: 'FOR FREE' }
       ],
-      cta: { text: 'Collect Now' }
+      cta: { text: 'Claim Now' }
     },
 
     render(config) {
-      const amountsHtml = config.amounts.map(a => {
-        const labelHtml = a.label
-          ? `\n        <span class="popup-amount-label" style="color:${a.color}">${a.label}</span>`
-          : '';
-        return `      <div class="popup-amount">
-        <img class="popup-amount-icon" src="${a.icon}" alt="">
-        <span class="popup-amount-value" style="color:${a.color}">${a.value}</span>${labelHtml}
-      </div>`;
+      const currencyRows = (config.currencies || []).map(c => {
+        const labelHtml = c.label ? `\n                  <span class="popup-currency-label">${c.label}</span>` : '';
+        return `                <div class="popup-currency-row">
+                  <img class="popup-currency-icon" src="${c.icon}" alt="">
+                  <span class="popup-currency-value">${c.value}</span>${labelHtml}
+                </div>`;
       }).join('\n');
 
-      return `<div class="popup-overlay">
-  <div class="popup-container popup--free-coins-v1">
-    <div class="popup-bg"></div>
-    <button class="popup-close">&times;</button>
-    <div class="popup-content">
-      <h2 class="popup-title">${config.title}</h2>
-      <p class="popup-subtitle">${config.subtitle}</p>
-      <div class="popup-hero">
-        <img src="${config.heroImage}" alt="Coins">
-      </div>
-      <div class="popup-amounts">
-${amountsHtml}
-      </div>
-      <button class="popup-cta">${config.cta.text}</button>
-    </div>
-  </div>
-</div>`;
-    },
+      const titleHtml = config.titleImage
+        ? `<img class="popup-title-image" src="${config.titleImage}" alt="CLAIM YOUR FREE COINS!">`
+        : '';
 
-    css: `.popup--free-coins-v1 .popup-bg {
-  background: linear-gradient(180deg, #0a2a4a 0%, #0d1b2a 100%);
-}
-
-.popup--free-coins-v1 .popup-title {
-  color: #ffe14d;
-  font-size: 32px;
-}
-
-.popup--free-coins-v1 .popup-cta {
-  background: linear-gradient(180deg, #0fffb2 0%, #00d68f 100%);
-  color: #0a2e1a;
-}`
+      return `<div class="popup-overlay active">
+          <div class="popup-container popup-free-coins">
+            <button class="popup-close" aria-label="Close">
+              ${CLOSE_SVG}
+            </button>
+            <div class="popup-hero popup-hero--animated">
+              <img src="${config.heroImage}" alt="">
+            </div>
+            ${titleHtml}
+            <div class="popup-content">
+              <p class="popup-subtitle">${config.subtitle}</p>
+              <div class="popup-currencies">
+${currencyRows}
+              </div>
+              <button class="popup-cta">${config.cta.text}</button>
+            </div>
+          </div>
+        </div>`;
+    }
   },
 
   /* -------------------------------------------------------
-     TEMPLATE 3: Free Coins V2
+     TEMPLATE 3: Free Coins V2 (Login Rewards)
      ------------------------------------------------------- */
   {
     name: 'Free Coins V2',
     defaultConfig: {
-      title: 'Claim Your Free Coins',
-      subtitle: 'Daily Login Reward',
-      heroImage: 'assets/images/treasure-chest.svg',
-      amounts: [
-        { icon: 'assets/images/gc-coin.svg', value: '2,000,000', color: '#ffe14d' },
-        { icon: 'assets/images/sc-coin.svg', value: '10', color: '#0fffb2', label: 'FREE' }
-      ],
-      cta: { text: 'Claim Reward' }
+      title: 'LOGIN REWARDS',
+      subtitle: 'SHOW UP DAILY - AND CLAIM YOUR REWARDS',
+      heroImage: 'assets/images/gift-box.png',
+      scatterImages: {
+        tl: 'assets/images/sc-coins-scatter1.png',
+        mr: 'assets/images/sc-coins-scatter2.png',
+        tr: 'assets/images/roo-coins-scatter.png'
+      },
+      cta: { text: 'Claim 1 SC', icon: 'assets/images/sc-coin.png' },
+      claimCoinImage: 'assets/images/sc-coin.png'
     },
 
     render(config) {
-      const amountsHtml = config.amounts.map(a => {
-        const labelHtml = a.label
-          ? `\n          <span class="popup-amount-label" style="color:${a.color}">${a.label}</span>`
-          : '';
-        return `        <div class="popup-amount">
-          <img class="popup-amount-icon" src="${a.icon}" alt="">
-          <span class="popup-amount-value" style="color:${a.color}">${a.value}</span>${labelHtml}
+      const scatter = config.scatterImages || {};
+      const ctaIcon = config.cta.icon
+        ? `<img class="popup-cta-icon" src="${config.cta.icon}" alt="">`
+        : '';
+      const coinImg = config.claimCoinImage || 'assets/images/sc-coin.png';
+
+      return `<div class="popup-overlay active">
+          <div class="popup-container popup-free-coins-v2">
+            <button class="popup-close" aria-label="Close">
+              ${CLOSE_SVG}
+            </button>
+            <h2 class="popup-title">${config.title}</h2>
+            <div class="popup-hero popup-hero--animated">
+              <img class="popup-scatter scatter-tl" src="${scatter.tl}" alt="">
+              <img class="popup-scatter scatter-mr" src="${scatter.mr}" alt="">
+              <img class="popup-scatter scatter-tr" src="${scatter.tr}" alt="">
+              <img class="popup-hero-main" src="${config.heroImage}" alt="">
+            </div>
+            <div class="popup-content">
+              <p class="popup-subtitle">${config.subtitle}</p>
+              <button class="popup-cta" id="cta-v2">
+                <img class="popup-claim-coin" src="${coinImg}" alt="" style="--coin-x: calc(-50% + -40px); animation-delay: 0s;">
+                <img class="popup-claim-coin" src="${coinImg}" alt="" style="--coin-x: calc(-50% + -15px); animation-delay: 0.07s;">
+                <img class="popup-claim-coin" src="${coinImg}" alt="" style="--coin-x: calc(-50% + 10px); animation-delay: 0.14s;">
+                <img class="popup-claim-coin" src="${coinImg}" alt="" style="--coin-x: calc(-50% + 35px); animation-delay: 0.21s;">
+                <img class="popup-claim-coin" src="${coinImg}" alt="" style="--coin-x: calc(-50% + -25px); animation-delay: 0.28s;">
+                ${ctaIcon}
+                <span>${config.cta.text}</span>
+              </button>
+            </div>
+          </div>
         </div>`;
-      }).join('\n');
-
-      return `<div class="popup-overlay">
-  <div class="popup-container popup--free-coins-v2">
-    <div class="popup-bg"></div>
-    <button class="popup-close">&times;</button>
-    <div class="popup-content">
-      <h2 class="popup-title">${config.title}</h2>
-      <p class="popup-subtitle">${config.subtitle}</p>
-      <div class="popup-hero">
-        <img src="${config.heroImage}" alt="Treasure">
-      </div>
-      <div class="popup-amounts">
-${amountsHtml}
-      </div>
-      <button class="popup-cta">${config.cta.text}</button>
-    </div>
-  </div>
-</div>`;
-    },
-
-    css: `.popup--free-coins-v2 .popup-bg {
-  background: linear-gradient(180deg, #1e0540 0%, #12002b 80%, #0a0015 100%);
-}
-
-.popup--free-coins-v2 .popup-title {
-  font-size: 24px;
-  color: #ffffff;
-}
-
-.popup--free-coins-v2 .popup-subtitle {
-  color: #0fffb2;
-  font-size: 14px;
-  letter-spacing: 0.5px;
-}
-
-.popup--free-coins-v2 .popup-amounts {
-  flex-direction: column;
-  gap: 12px;
-}
-
-.popup--free-coins-v2 .popup-amount {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 10px 20px;
-  width: 100%;
-  justify-content: flex-start;
-}
-
-.popup--free-coins-v2 .popup-cta {
-  background: linear-gradient(180deg, #a855f7 0%, #7c3aed 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
-}
-
-.popup--free-coins-v2 .popup-cta:hover {
-  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
-}`
+    }
   }
 ];

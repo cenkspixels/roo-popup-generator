@@ -233,8 +233,18 @@ body {
 /* Preview resets — popup styles render inside here */
 .preview-area .popup-overlay {
   position: relative;
-  inset: auto;
+  top: auto; right: auto; bottom: auto; left: auto;
   background: transparent;
+  opacity: 1;
+  visibility: visible;
+}
+.preview-area .popup-overlay .popup-container {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+/* Allow V1 hero to overflow in preview */
+.preview-area .popup-overlay .popup-free-coins {
+  margin-top: 50px;
 }
 
 /* ----------------------------------------------------------
